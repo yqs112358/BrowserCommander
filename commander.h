@@ -24,7 +24,7 @@
 #include "Browser/webview.h"
 
 #include "signalshelper.h"
-#include "outputhelp.h"
+#include "iohelp.h"
 
 #define CONF_PATH "BrowserCommander.ini"
 

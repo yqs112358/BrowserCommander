@@ -1,6 +1,6 @@
 QT    += core gui webenginewidgets
 
-CONFIG += c++11
+CONFIG += c++11 console
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -17,7 +17,7 @@ SOURCES +=  \
         Browser/webview.cpp \
         commander.cpp \
         main.cpp \
-        outputhelp.cpp \
+        iohelp.cpp \
         signalshelper.cpp
 
 TRANSLATIONS += \
@@ -39,7 +39,7 @@ HEADERS += \
     Browser/webpopupwindow.h \
     Browser/webview.h \
     commander.h \
-    outputhelp.h \
+    iohelp.h \
     signalshelper.h
 
 DISTFILES += \
@@ -58,12 +58,15 @@ DISTFILES += \
     BrowserCommander.ini
 
 RESOURCES += \
-    Browser/data/browsercommander.qrc
+    Browser/data/browser.qrc \
+    BrowserCommander.qrc
 
 FORMS += \
     Browser/certificateerrordialog.ui \
     Browser/downloadmanagerwidget.ui \
     Browser/downloadwidget.ui \
     Browser/passworddialog.ui
+
+LIBS += -luser32
 
 RC_ICONS = BrowserCommander.ico

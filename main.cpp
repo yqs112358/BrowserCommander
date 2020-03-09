@@ -1,3 +1,5 @@
+#pragma execution_character_set("utf-8")
+
 #include <QApplication>
 #include <QTranslator>
 #include <QStyleFactory>
@@ -6,64 +8,61 @@
 #include <QCommandLineParser>
 #include <QSettings>
 #include <QFile>
+#include <QByteArray>
 
+#ifdef Q_OS_WIN
 #include <windows.h>
-#include <cstdio>
+#endif
+
+#define _S(text) QStringLiteral(text)
+#define APP_NAME "BrowserCommander"
+#define VER "0.6.1"
 
 #include "commander.h"
-#include "outputhelp.h"
+#include "iohelp.h"
 
-#define VER L"0.6.0"
-
-extern OutputHelp output;
+extern IoHelp iohelp;
 
 void outputTransfer(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-        Q_UNUSED(context)
+    Q_UNUSED(context)
 
-        static QMutex mutex;
-        mutex.lock();
+    static QMutex mutex;
+    QString foreOutput;
+    if(type != QtDebugMsg)
+    {
+        foreOutput=_S("[%1 ")
+                .arg(QDateTime::currentDateTime().toString(_S("yyyy-MM-dd hh:mm:ss")));
         switch(type)
         {
-        case QtDebugMsg:
-            *(output.stdOut) << msg;
-            output.stdOut->flush();
-            break;
         case QtInfoMsg:
-            if(output.debugOutDevice.isOpen())
-            {
-                output.debugOut << "[" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                                << " Info]" << msg;
-                output.debugOut.flush();
-            }
+            foreOutput.append(_S("Info]"));
             break;
         case QtWarningMsg:
-            if(output.debugOutDevice.isOpen())
-            {
-                output.debugOut << "[" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                                << " Warning]" << msg;
-                output.debugOut.flush();
-            }
+            foreOutput.append(_S("Warning]"));
             break;
         case QtCriticalMsg:
-            if(output.debugOutDevice.isOpen())
-            {
-                output.debugOut << "[" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                                << " Critical]" << msg;
-                output.debugOut.flush();
-            }
+            foreOutput.append(_S("Critical]"));
             break;
         case QtFatalMsg:
-            if(output.debugOutDevice.isOpen())
-            {
-                output.debugOut << "[" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                                << " FATAL]" << msg;
-                output.debugOut.flush();
-            }
+            foreOutput.append(_S("FATAL]"));
+            break;
+        default:
             break;
         }
-
-        mutex.unlock();
+    }
+    mutex.lock();
+    if(type == QtDebugMsg)
+    {
+        iohelp.cout << msg;
+    }
+    else
+    {
+        if(iohelp.cerrDevice.isOpen())
+            iohelp.cerr << foreOutput << msg;
+    }
+    iohelp.cout.flush();
+    mutex.unlock();
 }
 
 int main(int argc, char *argv[])
@@ -72,57 +71,62 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QApplication a(argc, argv);
     //Settings
-    a.setWindowIcon(QIcon(QStringLiteral(":AppLogoColor.png")));
-    QCoreApplication::setOrganizationName("BrowserCommander");
-    QCoreApplication::setApplicationName("BrowserCommander");
-    QCoreApplication::setApplicationVersion(QString::fromWCharArray(VER));
-    //qputenv("QTWEBENGINEPROCESS_PATH", QStringLiteral("./BrowserCommanderWeb.exe").toLocal8Bit());
+    a.setWindowIcon(QIcon(_S(":AppLogoColor.png")));
+    QCoreApplication::setOrganizationName(_S(APP_NAME));
+    QCoreApplication::setApplicationName(_S(APP_NAME));
+    QCoreApplication::setApplicationVersion(_S(VER));
+    #ifdef Q_OS_WIN
+    //QCoreApplication::addLibraryPath();
+    qputenv("QTWEBENGINEPROCESS_PATH", _S("./BrowserCommanderWeb.exe").toLocal8Bit());
+    SetConsoleTitleA(APP_NAME);
+    #endif
 
     //Command-line analysis
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
     parser.setApplicationDescription(QObject::tr("A simple browser which can be controlled by CLI and script files"));
-    parser.addPositionalArgument(".bcs script file",".bcs script file which is runned automatically");
+    parser.addPositionalArgument(_S(".bcs script file")
+                                 ,QObject::tr(".bcs script file which is runned automatically"));
     parser.process(a);
     QStringList autoScripts(parser.positionalArguments());
 
     //Translator
     QTranslator *trans=new QTranslator;
-    QSettings conf(CONF_PATH);
-    QString lang=conf.value("Language","auto").toString();
-    QString transFileName=QString("translations/BrowserCommander_%1.qm").arg(lang);
-    if((lang == "auto" || !QFile::exists(transFileName)) || !trans->load(transFileName))
+    QSettings conf(_S(CONF_PATH));
+    conf.beginGroup(_S("Main"));
+    QString lang=conf.value(_S("Language"),_S("auto")).toString();
+    if(lang != _S("en_US"))
     {
-        QLocale locale;
-        if(locale.language() == QLocale::Chinese)
+        QString transFileName=_S(":BrowserCommander_%1.qm").arg(lang);
+        if((lang == _S("auto") || !QFile::exists(transFileName)) || !trans->load(transFileName))
         {
-            trans->load("translations/BrowserCommander_zh_CN.qm");
-            a.installTranslator(trans);
+            QLocale locale;
+            if(locale.language() == QLocale::Chinese && trans->load(_S(":BrowserCommander_zh_CN.qm")))
+                a.installTranslator(trans);
         }
+        else
+            a.installTranslator(trans);
     }
-    else
-        a.installTranslator(trans);
-
+    conf.endGroup();
 
     //Style
-    a.setStyle(QStyleFactory::create("fusion"));
-
-    //Create New Console
-    //ONLY WINDOWS!
-    AllocConsole();
-    FILE *tmp,*tmp2;
-    freopen_s(&tmp,"CONIN$","r",stdin);
-    freopen_s(&tmp2,"CONOUT$","w",stdout);
-    wprintf(QObject::tr("[---BrowserCommander---] Version %s   Author:yqs112358\n[License] MIT License\n"
-                        "[Project on GitHub] https://github.com/yqs112358/BrowserCommander\n"
-                        "Welcome to your new ideas!\n").toStdWString().c_str(),VER);
+    a.setStyle(QStyleFactory::create(_S("fusion")));
 
     //Install output
-    output.changeOutput(QString());
+    iohelp.changeOutput(QString());
     qInstallMessageHandler(outputTransfer);
+    qDebug() << qPrintable(QObject::tr("<--- BrowserCommander ---> Version %1   Author:yqs112358\n"
+                            "[License] BSD-2-Clause\n"
+                            "[Project on GitHub] https://github.com/yqs112358/BrowserCommander\n"
+                            "[Project on GitHub] Welcome to your new ideas!\n"
+                            "Tips: Use the command 'Help' to get guidance.\n"
+                            ).arg(_S(VER)));
 
     Commander commander(autoScripts);
 
+    #ifdef Q_OS_WIN
+    SetActiveWindow(GetConsoleWindow());
+    #endif
     return a.exec();
 }

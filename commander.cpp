@@ -4,7 +4,9 @@
     QString QSTR_NAME(cmdIn.readAll().trimmed()); \
     if(QSTR_NAME.isEmpty()) { moreArgs(op); break; }
 
-extern OutputHelp output;
+#define _S(text) QStringLiteral(text)
+
+extern IoHelp iohelp;
 
 Commander::Commander(QStringList autoScripts,QObject *parent)
     :QThread(parent)
@@ -40,76 +42,75 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
 
 
     //Check Directories
-    QDir dir(".");
-    dir.mkdir("data");
-    dir.mkdir("AutoRun");
-    dir.mkdir("AutoJs");
+    QDir dir(_S("."));
+    dir.mkdir(_S("Data"));
+    dir.mkdir(_S("AutoRun"));
+    dir.mkdir(_S("AutoJs"));
 
-    QSettings conf(CONF_PATH,QSettings::IniFormat);
+    QSettings conf(_S(CONF_PATH),QSettings::IniFormat);
     //Main Settings
-    conf.beginGroup("Main");
+    conf.beginGroup(_S("Main"));
     //Default Output
-    QString defaultOutput=conf.value("DefaultOutput",QString()).toString();
+    QString defaultOutput=conf.value(_S("DefaultOutput"),QString()).toString();
     if(!defaultOutput.isEmpty())
-        output.changeOutput(defaultOutput);
+        iohelp.changeOutput(defaultOutput);
     //Debug Output
-    QString debugOutput=conf.value("DebugOutput",QString()).toString();
+    QString debugOutput=conf.value(_S("DebugOutput"),QString()).toString();
     if(!debugOutput.isEmpty())
     {
-        output.debugOutDevice.setFileName(debugOutput);
-        output.debugOutDevice.open(QIODevice::WriteOnly|QIODevice::Text);
-        output.debugOut.setDevice(&output.debugOutDevice);
+        iohelp.cerrDevice.setFileName(debugOutput);
+        iohelp.cerrDevice.open(QIODevice::WriteOnly|QIODevice::Text);
     }
     conf.endGroup();
 
-    conf.beginGroup("Browser");
+    conf.beginGroup(_S("Browser"));
     //Init Browser
     QWebEngineProfile *defProfile=QWebEngineProfile::defaultProfile();
-    defProfile->setCachePath("./data/");
-    defProfile->setPersistentStoragePath("./data/");
+    defProfile->setCachePath(_S("./Data/"));
+    defProfile->setPersistentStoragePath(_S("./Data/"));
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     browser=new Browser;
-    browser->createWindow(conf.value("DefaultPrivateMode",false).toBool());
+    browser->createWindow(conf.value(_S("DefaultPrivateMode"),false).toBool());
     changeWindow(0);
 
     //Browser Settings
 
     //First Page
-    QString firstPage=conf.value("FirstPage",QString()).toString();
+    QString firstPage=conf.value(_S("FirstPage"),QString()).toString();
     if(!firstPage.isEmpty())
         tabWidget->setUrl(QUrl::fromUserInput(firstPage));
     //User Agent
-    QString ua=conf.value("UserAgent",QString()).toString();
+    QString ua=conf.value(_S("UserAgent"),QString()).toString();
     if(!ua.isEmpty())
         sUserAgent(ua);
 
     conf.endGroup();
 
     //AutoRun
-    QString autoRunDir=conf.value("AutoRunScriptDir",QString()).toString();
+    QString autoRunDir=conf.value(_S("AutoRunScriptDir"),QString()).toString();
     if(!autoRunDir.isEmpty())
     {
         QDir dir(autoRunDir);
-        if(!autoRunDir.endsWith("/"))
-            autoRunDir.append("/");
+        if(!autoRunDir.endsWith(_S("/")))
+            autoRunDir.append(_S("/"));
         QStringList fileList=dir.entryList(QDir::Files);
         QString fileName;
         foreach(fileName,fileList)
-            if(fileName.endsWith(".bcs"))
+            if(fileName.endsWith(_S(".bcs")))
                 autorunScripts.append(autoRunDir+fileName);
     }
 
-    //AutoRun
-    QString autoAddJs=conf.value("AutoAddJsDir",QString()).toString();
+    //AutoJs
+    QString autoAddJs=conf.value(_S("AutoAddJsDir"),QString()).toString();
     if(!autoAddJs.isEmpty())
     {
         QDir dir(autoAddJs);
-        if(!autoAddJs.endsWith("/"))
-            autoAddJs.append("/");
+        if(!autoAddJs.endsWith(_S("/")))
+            autoAddJs.append(_S("/"));
         QStringList fileList=dir.entryList(QDir::Files);
         QString fileName;
         foreach(fileName,fileList)
-            if(fileName.endsWith(".js"))
+            if(fileName.endsWith(_S(".js")))
             {
                 QFile jsFile(autoRunDir+fileName);
                 if(jsFile.open(QIODevice::ReadOnly))
@@ -138,37 +139,37 @@ void Commander::writeMsg(QString text, Commander::MsgType type)
     switch(type)
     {
         case MsgType::Info:
-            strType="Info";
+            strType=_S("Info");
             break;
         case MsgType::Error:
-            strType="Error";
+            strType=_S("Error");
             break;
         case MsgType::Warning:
-            strType="Warning";
+            strType=_S("Warning");
             break;
         case MsgType::Fatal:
-            strType="FATAL";
+            strType=_S("FATAL");
             break;
         default:
-            strType="Info";
+            strType=_S("Info");
             break;
     }
-    qDebug() << qPrintable(tr("[%1 %2]%3\n").arg(OutputHelp::dateTimeStr()).arg(strType).arg(text));
+    qDebug() << qPrintable(tr("[%1 %2]%3\n").arg(IoHelp::dateTimeStr()).arg(strType).arg(text));
 }
 
 void Commander::unknownCmd(QString op)
 {
-    writeMsg(tr("Unknown Command '%1'.Enter 'Help' to get more information.").arg(op),MsgType::Error);
+    writeMsg(tr("Unknown Command '%1'.Use the command 'Help' to get more information.").arg(op),MsgType::Error);
 }
 
 void Commander::badArgs(QString op)
 {
-    writeMsg(tr("Bad Argument.Enter 'Help %1' to get more information.").arg(op),MsgType::Error);
+    writeMsg(tr("Bad Argument.Use the command 'Help %1' to get more information.").arg(op),MsgType::Error);
 }
 
 void Commander::moreArgs(QString op)
 {
-    writeMsg(tr("More Argument(s) needed.Enter 'Help %1' to get more information.").arg(op),MsgType::Error);
+    writeMsg(tr("More Argument(s) needed.Use the command 'Help %1' to get more information.").arg(op),MsgType::Error);
 }
 
 void Commander::run()
@@ -201,18 +202,19 @@ void Commander::splitCmds(QTextStream *stdIn, bool isScript)
     QString cmdLine;
     while(true)
     {
-        if(!isInScript)
-            qDebug() << qPrintable(QStringLiteral("\n"));
-        qDebug() << qPrintable(tr("%1 %2>").arg(OutputHelp::dateTimeStr())
-                               .arg(isJsConsoleMode?"JsConsole":"Browser"));
+        if(!isInScript || iohelp.coutDevice.isOpen())
+            qDebug() << qPrintable(_S("\n"));
+        qDebug() << qPrintable(tr("%1 %2>").arg(IoHelp::dateTimeStr())
+                               .arg(isJsConsoleMode?_S("JsConsole"):_S("Browser")));
+
         cmdLine=stdIn->readLine();
-        if(isInScript || output.outDevice.isOpen())
-            qDebug() << qPrintable(cmdLine) << "\n";
+        if(isInScript)
+            qDebug() << qPrintable(cmdLine) << _S("\n");
 
         bool isEnd=false;
         if(isJsConsoleMode)
         {
-            if(cmdLine.toLower() == "exit" || cmdLine.toLower() == "quit")
+            if(cmdLine.toLower() == _S("exit") || cmdLine.toLower() == _S("quit"))
                 isJsConsoleMode=false;
             else
             {
@@ -235,7 +237,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
     bool isNext=true;
 
     cmdStr=cmdStr.trimmed();
-    if(cmdStr.isEmpty() || cmdStr[0]==QChar('#'))
+    if(cmdStr.isEmpty() || cmdStr[0] == QChar('#'))
         return true;
 
     QTextStream cmdIn(&cmdStr);
@@ -245,53 +247,54 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
     switch(op[0].toLatin1())
     {
     case 'h':
-        if(op == "help")
+        if(op == _S("help"))
         {
-            writeMsg("Sorry,this function has not been finished yet.");
+            writeMsg(tr("Sorry,this function has not been finished yet."));
         }
         else
             unknownCmd(op);
         break;
 
     case 'j':
-        if(op == "js")
+        if(op == _S("js"))
         {
             USE_LEFT_ARG(code)
             emit sender->runJs(code);
             waitFinished();
         }
-        else if(op == "jsconsole")
+        else if(op == _S("jsconsole"))
         {
             isJsConsoleMode=true;
         }
-        else if(op == "jssend" || op == "jss")
+        else if(op == _S("jssend") || op == _S("jss"))
         {
             USE_LEFT_ARG(code)
             emit sender->jsSend(code);
         }
-        else if(op == "jsbegin")
+        else if(op == _S("jsbegin"))
         {
-            QString curLine,code="";
+            QString curLine,code;
             while(true)
             {
-                qDebug() << ">";
+                qDebug() << _S(">");
                 curLine=stdIn->readLine();
-                if(curLine.toLower() == "jsend")
+                if(curLine.toLower() == _S("jsend"))
                     break;
                 code.append(curLine);
             }
             emit sender->runJs(code);
             waitFinished();
         }
-        else if(op == "jsend")
-            writeMsg(tr("You have not entered 'JsBegin'. Enter 'Help JsBegin' to get more information.")
+        else if(op == _S("jsend"))
+            writeMsg(tr("You have not entered 'JsBegin'. "
+                        "Use the command 'Help JsBegin' to get more information.")
                      ,MsgType::Warning);
         else
             unknownCmd(op);
         break;
 
     case 'g':
-        if(op == "go")
+        if(op == _S("go"))
         {
             USE_LEFT_ARG(url)
             emit sender->stop();
@@ -302,32 +305,32 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 's':
-        if(op == "sleep")
+        if(op == _S("sleep"))
         {
             int sleepTime=-1;
             cmdIn >> sleepTime;
             if(sleepTime >0)
                 QThread::msleep(sleepTime);
         }
-        else if(op == "sleepsec")
+        else if(op == _S("sleepsec"))
         {
             int sleepTime=-1;
             cmdIn >> sleepTime;
             if(sleepTime >0)
                 QThread::sleep(sleepTime);
         }
-        else if(op == "stop")
+        else if(op == _S("stop"))
         {
             emit sender->stop();
         }
-        else if(op == "setjsworld")
+        else if(op == _S("setjsworld"))
         {
             int num=-1;
             cmdIn >> num;
             if(num >= 0)
                 jsWorld=num;
         }
-        else if(op == "save")
+        else if(op == _S("save"))
         {
             USE_LEFT_ARG(fileName)
             emit sender->save(fileName);
@@ -337,7 +340,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'w':
-        if(op == "wait")
+        if(op == _S("wait"))
         {
             sender->waitLoading();
         }
@@ -346,12 +349,12 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'e':
-        if (op == "exit")
+        if (op == _S("exit"))
         {
             emit sender->exit();
             isNext=false;
         }
-        else if(op == "end")
+        else if(op == _S("end"))
         {
             if(isInScript)
                 isNext=false;
@@ -363,7 +366,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'q':
-        if (op == "quit")
+        if (op == _S("quit"))
         {
             emit sender->exit();
             isNext=false;
@@ -373,7 +376,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'b':
-        if(op == "back")
+        if(op == _S("back"))
         {
             emit sender->back();
         }
@@ -382,7 +385,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'f':
-        if(op == "forward")
+        if(op == _S("forward"))
         {
             emit sender->forward();
         }
@@ -391,11 +394,11 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'r':
-        if(op == "reload" || op == "refresh")
+        if(op == _S("reload") || op == _S("refresh"))
         {
             emit sender->reload();
         }
-        else if(op == "run")
+        else if(op == _S("run"))
         {
             USE_LEFT_ARG(scriptFileName)
             QFile scriptFile(scriptFileName);
@@ -410,7 +413,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
                 scriptFile.close();
             }
         }
-        else if(op == "removejs")
+        else if(op == _S("removejs"))
         {
             USE_LEFT_ARG(jsFileName)
             emit sender->removeJs(jsFileName);
@@ -420,16 +423,16 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'p':
-        if(op == "previoustab" || op == "prevtab")
+        if(op == _S("previoustab") || op == _S("prevtab"))
         {
             emit sender->previousTab();
         }
-        else if(op == "print")
+        else if(op == _S("print"))
         {
             if(isInScript)
             {
                 USE_LEFT_ARG(printStr)
-                qDebug() << printStr << "\n";
+                qDebug() << qPrintable(printStr) << "\n";
             }
             else
                 writeMsg(tr("Command 'Print' is only used in scripts."),MsgType::Warning);
@@ -439,11 +442,11 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'n':
-        if(op == "nexttab")
+        if(op == _S("nexttab"))
         {
             emit sender->nextTab();
         }
-        else if(op == "newtab")
+        else if(op == _S("newtab"))
         {
             emit sender->newTab();
         }
@@ -452,17 +455,17 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'o':
-        if(op == "changeoutput")
+        if(op == _S("changeoutput"))
         {
             USE_LEFT_ARG(newOutput)
-            output.changeOutput(newOutput);
+            iohelp.changeOutput(newOutput);
         }
         else
             unknownCmd(op);
         break;
 
     case 'a':
-        if(op == "addjs")
+        if(op == _S("addjs"))
         {
             QString jsType;
             QWebEngineScript::InjectionPoint point;
@@ -473,11 +476,11 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
                 break;
             }
             jsType=jsType.toLower();
-            if(jsType == "begin")
+            if(jsType == _S("begin"))
                 point=QWebEngineScript::InjectionPoint::DocumentCreation;
-            else if(jsType == "ready")
+            else if(jsType == _S("ready"))
                 point=QWebEngineScript::InjectionPoint::DocumentReady;
-            else if(jsType == "deferred")
+            else if(jsType == _S("deferred"))
                 point=QWebEngineScript::InjectionPoint::Deferred;
             else
             {
@@ -495,58 +498,39 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
             QFile jsFile(jsFileName);
             emit sender->addJs(jsFile.readAll(),info.fileName(),point);
         }
-        else if(op == "about")
+        else if(op == _S("about"))
         {
-            writeMsg("Sorry,this function has not been finished yet.");
+            writeMsg(tr("Sorry,this function has not been finished yet."));
         }
         else
             unknownCmd(op);
         break;
 
     case 'c':
-        if(op == "changewindow")
+        if(op == _S("changewindow"))
         {
             int num=-1;
             cmdIn >> num;
             if(num >= 0)
                 changeWindow(num);
         }
-        else if(op == "closetab")
+        else if(op == _S("closetab"))
         {
             emit sender->closeTab();
         }
-        else if(op == "clearscreen" || op == "cls")
+        else if(op == _S("clearscreen") || op == _S("cls"))
         {
-            //ONLY WINDOWS!
-            HANDLE hStdOut;
-            CONSOLE_SCREEN_BUFFER_INFO bufInfo;
-            SMALL_RECT scroll;
-            COORD newCursorPointer;
-            CHAR_INFO ciFill;
-            hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-            if(!GetConsoleScreenBufferInfo(hStdOut, &bufInfo))
-                break;
-            scroll.Left = 0;
-            scroll.Top = 0;
-            scroll.Right = bufInfo.dwSize.X;
-            scroll.Bottom = bufInfo.dwSize.Y;
-            newCursorPointer.X = 0;
-            newCursorPointer.Y = -bufInfo.dwSize.Y;
-            ciFill.Char.UnicodeChar = L' ';
-            ciFill.Attributes = bufInfo.wAttributes;
-            ScrollConsoleScreenBufferW(hStdOut, &scroll, NULL, newCursorPointer, &ciFill);
-            newCursorPointer.Y = 0;
-            SetConsoleCursorPosition(hStdOut, newCursorPointer);
+            writeMsg(tr("Sorry,this function has not been finished yet."));
         }
-        else if(op == "clearcookie")
+        else if(op == _S("clearcookie"))
         {
             emit sender->clearCookie();
         }
-        else if(op == "clearcache")
+        else if(op == _S("clearcache"))
         {
             emit sender->clearCache();
         }
-        else if(op == "clearhistory")
+        else if(op == _S("clearhistory"))
         {
             emit sender->clearHistory();
         }
@@ -555,16 +539,16 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'l':
-        if(op == "license")
+        if(op == _S("license"))
         {
-            writeMsg("Sorry,this function has not been finished yet.");
+            writeMsg(tr("Sorry,this function has not been finished yet."));
         }
         else
             unknownCmd(op);
         break;
 
     case 'z':
-        if(op == "zoom")
+        if(op == _S("zoom"))
         {
             qreal num=0;
             cmdIn >> num;
@@ -576,7 +560,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'u':
-        if(op == "useragent")
+        if(op == _S("useragent"))
         {
             USE_LEFT_ARG(ua)
             emit sender->userAgent(ua);
@@ -651,7 +635,7 @@ void Commander::sStop()
 
 void Commander::sRestart()
 {
-    writeMsg("Sorry,this function has not been finished yet.");
+    writeMsg(tr("Sorry,this function has not been finished yet."));
 }
 
 void Commander::sSave(QString path)
@@ -683,7 +667,7 @@ void Commander::sClearCache()
 
 void Commander::sHistory()
 {
-    writeMsg("Sorry,this function has not been finished yet.");
+    writeMsg(tr("Sorry,this function has not been finished yet."));
 }
 
 void Commander::sPreviousTab()
@@ -714,7 +698,9 @@ void Commander::sUserAgent(QString ua)
 void Commander::sRunJs(QString code)
 {
     curView->page()->runJavaScript(code,jsWorld,[](QVariant data)
-        {qDebug() << qPrintable(tr("[%1 JsOutput]").arg(OutputHelp::dateTimeStr()))<< data << "\n";;});
+    {
+        qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()))<< data << "\n";
+    });
 }
 
 void Commander::sJsSend(QString code)

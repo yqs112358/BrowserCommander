@@ -1,6 +1,8 @@
 #include "signalshelper.h"
 #include <QDateTime>
 
+#define _S(text) QStringLiteral(text)
+
 SignalsHelper::SignalsHelper(Commander *c) : commander(c)
 {
 
