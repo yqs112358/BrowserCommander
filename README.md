@@ -1,4 +1,4 @@
-# BrowserCommander BC浏览器 ![BSD-2 License](https://github.com/yqs112358/BrowserCommander/images/License.svg) ![Qt 5.12 LTS](https://github.com/yqs112358/BrowserCommander/images/Qt.svg) ![Releases version](https://img.shields.io/github/v/release/yqs112358/BrowserCommander?color=green&include_prereleases)
+# BrowserCommander BC浏览器 ![License](https://i.loli.net/2020/03/09/iGCIrWuR7z2fL5P.jpg) ![Qt](https://i.loli.net/2020/03/09/7b1LGn8qSZOldXf.jpg) ![Releases version](https://img.shields.io/github/v/release/yqs112358/BrowserCommander?color=green&include_prereleases)
 ## 项目介绍
 一个可用命令行或脚本控制的小巧编写的浏览器。可以方便地利用脚本实现多种自动化任务，自动签到，定时打卡，乃至脚本刷分，发挥创造力来解放你的双手！
 
@@ -11,11 +11,11 @@
 说明：由于当初的架构设计缺陷（消息循环与控制台读写不能共存）故采用单独线程创建控制台与浏览器交互，这导致一定程度的代码复杂以及用户体验问题。后续版本计划单独拆分出控制台进程，使用C/S模型通信以解决上述缺陷同时避免控制台操作以简化跨平台移植难度。
 
 ## 运行截图
-![Example](https://github.com/yqs112358/BrowserCommander/blob/master/images/Example.JPG)
+![Example.JPG](https://i.loli.net/2020/03/09/fcHInYyBhXape7r.jpg)
 
 ## 命令列表
-![Command List](https://github.com/yqs112358/BrowserCommander/blob/master/images/Command1.JPG)
-![Command List](https://github.com/yqs112358/BrowserCommander/blob/master/images/Command2.JPG)
+![Command1.JPG](https://i.loli.net/2020/03/09/kKIEi7oVuSaPC8J.jpg)
+![Command2.JPG](https://i.loli.net/2020/03/09/tRXze6prLAPZG5b.jpg)
 
 ## 实用脚本实例
 ######  作者开发中。。。
