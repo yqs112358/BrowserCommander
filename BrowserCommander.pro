@@ -67,6 +67,4 @@ FORMS += \
     Browser/downloadwidget.ui \
     Browser/passworddialog.ui
 
-LIBS += -luser32
-
 RC_ICONS = BrowserCommander.ico

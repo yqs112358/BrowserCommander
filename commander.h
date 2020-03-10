@@ -26,7 +26,7 @@
 #include "signalshelper.h"
 #include "iohelp.h"
 
-#define CONF_PATH "BrowserCommander.ini"
+#define CONF_PATH "./BrowserCommander.ini"
 
 class SignalsHelper;
 

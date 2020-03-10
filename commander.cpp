@@ -48,6 +48,7 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
     dir.mkdir(_S("AutoJs"));
 
     QSettings conf(_S(CONF_PATH),QSettings::IniFormat);
+
     //Main Settings
     conf.beginGroup(_S("Main"));
     //Default Output
@@ -63,6 +64,7 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
     }
     conf.endGroup();
 
+    //Browser Settings
     conf.beginGroup(_S("Browser"));
     //Init Browser
     QWebEngineProfile *defProfile=QWebEngineProfile::defaultProfile();
@@ -72,9 +74,6 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
     browser=new Browser;
     browser->createWindow(conf.value(_S("DefaultPrivateMode"),false).toBool());
     changeWindow(0);
-
-    //Browser Settings
-
     //First Page
     QString firstPage=conf.value(_S("FirstPage"),QString()).toString();
     if(!firstPage.isEmpty())
@@ -86,27 +85,32 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
 
     conf.endGroup();
 
+    //AutoRun Settings
+    conf.beginGroup(_S("Main"));
     //AutoRun
-    QString autoRunDir=conf.value(_S("AutoRunScriptDir"),QString()).toString();
+    QString autoRunDir=conf.value(_S("AutoRunScriptsDir"),QString()).toString();
     if(!autoRunDir.isEmpty())
     {
+        if(autoRunDir.endsWith(_S("/")))
+            autoRunDir.remove(autoRunDir.size()-1,1);
         QDir dir(autoRunDir);
-        if(!autoRunDir.endsWith(_S("/")))
-            autoRunDir.append(_S("/"));
+        autoRunDir.append(_S("/"));
+
         QStringList fileList=dir.entryList(QDir::Files);
         QString fileName;
         foreach(fileName,fileList)
             if(fileName.endsWith(_S(".bcs")))
                 autorunScripts.append(autoRunDir+fileName);
     }
-
     //AutoJs
     QString autoAddJs=conf.value(_S("AutoAddJsDir"),QString()).toString();
     if(!autoAddJs.isEmpty())
     {
+        if(autoAddJs.endsWith(_S("/")))
+            autoAddJs.remove(autoAddJs.size()-1,1);
         QDir dir(autoAddJs);
-        if(!autoAddJs.endsWith(_S("/")))
-            autoAddJs.append(_S("/"));
+        autoAddJs.append(_S("/"));
+
         QStringList fileList=dir.entryList(QDir::Files);
         QString fileName;
         foreach(fileName,fileList)
@@ -124,6 +128,7 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
                 }
             }
     }
+    conf.endGroup();
 
     start();
 }
@@ -202,14 +207,14 @@ void Commander::splitCmds(QTextStream *stdIn, bool isScript)
     QString cmdLine;
     while(true)
     {
-        if(!isInScript || iohelp.coutDevice.isOpen())
+        if(!isInScript)
             qDebug() << qPrintable(_S("\n"));
         qDebug() << qPrintable(tr("%1 %2>").arg(IoHelp::dateTimeStr())
                                .arg(isJsConsoleMode?_S("JsConsole"):_S("Browser")));
 
         cmdLine=stdIn->readLine();
         if(isInScript)
-            qDebug() << qPrintable(cmdLine) << _S("\n");
+            qDebug() << qPrintable(cmdLine) << "\n";
 
         bool isEnd=false;
         if(isJsConsoleMode)
@@ -276,7 +281,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
             QString curLine,code;
             while(true)
             {
-                qDebug() << _S(">");
+                qDebug() << ">";
                 curLine=stdIn->readLine();
                 if(curLine.toLower() == _S("jsend"))
                     break;
@@ -697,9 +702,10 @@ void Commander::sUserAgent(QString ua)
 
 void Commander::sRunJs(QString code)
 {
-    curView->page()->runJavaScript(code,jsWorld,[](QVariant data)
+    curView->page()->runJavaScript(code,jsWorld,[this](QVariant data)
     {
         qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()))<< data << "\n";
+        isWaitingFinished=false;
     });
 }
 

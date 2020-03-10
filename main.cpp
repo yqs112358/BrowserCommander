@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QByteArray>
+#include <QTextCodec>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -69,12 +70,14 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
     //Settings
     a.setWindowIcon(QIcon(_S(":AppLogoColor.png")));
     QCoreApplication::setOrganizationName(_S(APP_NAME));
     QCoreApplication::setApplicationName(_S(APP_NAME));
     QCoreApplication::setApplicationVersion(_S(VER));
+    //Win settings
     #ifdef Q_OS_WIN
     //QCoreApplication::addLibraryPath();
     qputenv("QTWEBENGINEPROCESS_PATH", _S("./BrowserCommanderWeb.exe").toLocal8Bit());
@@ -93,7 +96,7 @@ int main(int argc, char *argv[])
 
     //Translator
     QTranslator *trans=new QTranslator;
-    QSettings conf(_S(CONF_PATH));
+    QSettings conf(_S(CONF_PATH),QSettings::IniFormat);
     conf.beginGroup(_S("Main"));
     QString lang=conf.value(_S("Language"),_S("auto")).toString();
     if(lang != _S("en_US"))
@@ -125,8 +128,5 @@ int main(int argc, char *argv[])
 
     Commander commander(autoScripts);
 
-    #ifdef Q_OS_WIN
-    SetActiveWindow(GetConsoleWindow());
-    #endif
     return a.exec();
 }

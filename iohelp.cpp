@@ -8,8 +8,7 @@ IoHelp iohelp;
 IoHelp::IoHelp()
     :cout(&coutDevice),cerr(&cerrDevice)
 {
-    cout.setAutoDetectUnicode(true);
-    cerr.setAutoDetectUnicode(true);
+
 }
 
 bool IoHelp::changeOutput(QString outputFile)

@@ -1,4 +1,4 @@
-# BrowserCommander BC浏览器![GitHub license](https://img.shields.io/badge/license-BSD--2--Clause-blue) ![Qt5.12 LTS](https://img.shields.io/badge/Qt-5.12%20LTS-orange) ![Releases version](https://img.shields.io/github/v/release/yqs112358/BrowserCommander?color=green&include_prereleases)
+# BrowserCommander BC浏览器 ![GitHub license](https://img.shields.io/badge/license-BSD--2--Clause-blue) ![Qt5.12 LTS](https://img.shields.io/badge/Qt-5.12%20LTS-orange) ![Releases version](https://img.shields.io/github/v/release/yqs112358/BrowserCommander?color=green&include_prereleases)
 ## 项目介绍
 一个可用命令行或脚本控制的小巧编写的浏览器。可以方便地利用脚本实现多种自动化任务，自动签到，定时打卡，乃至脚本刷分，发挥创造力来解放你的双手！
 
@@ -14,7 +14,7 @@
 ![Example.JPG](https://i.loli.net/2020/03/10/x1z5dawZnlvDKE6.jpg)
 
 ## 命令列表
-
+######  作者正在疯狂赶工中。。。
 
 ## 实用脚本实例
-######  作者开发中。。。
+######  作者正在疯狂赶工中。。。

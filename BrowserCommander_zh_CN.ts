@@ -264,75 +264,75 @@ Do you wish to override the security check and continue ?   </translation>
 <context>
     <name>Commander</name>
     <message>
-        <location filename="commander.cpp" line="157"/>
+        <location filename="commander.cpp" line="161"/>
         <source>[%1 %2]%3
 </source>
         <translation>[%1 %2]%3
 </translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="162"/>
+        <location filename="commander.cpp" line="166"/>
         <source>Unknown Command &apos;%1&apos;.Use the command &apos;Help&apos; to get more information.</source>
         <translation>未知命令 &apos;%1&apos;。使用命令 &apos;Help&apos; 来获取更多帮助。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="167"/>
+        <location filename="commander.cpp" line="171"/>
         <source>Bad Argument.Use the command &apos;Help %1&apos; to get more information.</source>
         <translation>命令参数错误。使用命令 &apos;Help %1&apos; 来获取更多帮助。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="172"/>
+        <location filename="commander.cpp" line="176"/>
         <source>More Argument(s) needed.Use the command &apos;Help %1&apos; to get more information.</source>
         <translation>命令需要更多参数。使用命令 &apos;Help %1&apos; 来获取更多帮助。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="207"/>
+        <location filename="commander.cpp" line="211"/>
         <source>%1 %2&gt;</source>
         <translation>%1 %2&gt;</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="252"/>
-        <location filename="commander.cpp" line="503"/>
-        <location filename="commander.cpp" line="523"/>
-        <location filename="commander.cpp" line="544"/>
-        <location filename="commander.cpp" line="638"/>
-        <location filename="commander.cpp" line="670"/>
+        <location filename="commander.cpp" line="256"/>
+        <location filename="commander.cpp" line="507"/>
+        <location filename="commander.cpp" line="527"/>
+        <location filename="commander.cpp" line="548"/>
+        <location filename="commander.cpp" line="642"/>
+        <location filename="commander.cpp" line="674"/>
         <source>Sorry,this function has not been finished yet.</source>
         <translation>不好意思，这个功能还没有做完。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="289"/>
+        <location filename="commander.cpp" line="293"/>
         <source>You have not entered &apos;JsBegin&apos;. Use the command &apos;Help JsBegin&apos; to get more information.</source>
         <oldsource>You have not entered &apos;JsBegin&apos;. Enter &apos;Help JsBegin&apos; to get more information.</oldsource>
         <translation>你还没进入命令&apos;JsBegin&apos;。使用命令 &apos;Help JsBegin&apos; 来获取更多帮助。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="362"/>
+        <location filename="commander.cpp" line="366"/>
         <source>Command &apos;End&apos; is only used in scripts.</source>
         <translation>命令&apos;End&apos;仅可用于bcs脚本中。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="406"/>
+        <location filename="commander.cpp" line="410"/>
         <source>Script file no found!</source>
         <translation>脚本文件未找到!</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="408"/>
+        <location filename="commander.cpp" line="412"/>
         <source>Fail to open Script file!</source>
         <translation>打开脚本文件失败！</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="438"/>
+        <location filename="commander.cpp" line="442"/>
         <source>Command &apos;Print&apos; is only used in scripts.</source>
         <translation>命令&apos;Print&apos;仅可用于bcs脚本中。</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="495"/>
+        <location filename="commander.cpp" line="499"/>
         <source>JS file no found!</source>
         <translation>JS文件未找到！</translation>
     </message>
     <message>
-        <location filename="commander.cpp" line="702"/>
+        <location filename="commander.cpp" line="706"/>
         <source>[%1 JsOutput]</source>
         <translation>[%1 JsOutput]</translation>
     </message>
@@ -450,17 +450,17 @@ Do you wish to override the security check and continue ?   </translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="main.cpp" line="86"/>
+        <location filename="main.cpp" line="91"/>
         <source>A simple browser which can be controlled by CLI and script files</source>
         <translation>一个小巧便携的浏览器，可以用命令行和脚本控制</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="88"/>
+        <location filename="main.cpp" line="93"/>
         <source>.bcs script file which is runned automatically</source>
         <translation>被自动执行的bcs脚本文件</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="115"/>
+        <location filename="main.cpp" line="122"/>
         <source>&lt;--- BrowserCommander ---&gt; Version %1   Author:yqs112358
 [License] BSD-2-Clause
 [Project on GitHub] https://github.com/yqs112358/BrowserCommander
@@ -475,8 +475,8 @@ Tips: Use the command &apos;Help&apos; to get guidance.
 </oldsource>
         <translation>&lt;--- BrowserCommander ---&gt; 版本 %1   作者：yqs112358
 [许可证] BSD-2-Clause
-[GitHub项目托管] https://github.com/yqs112358/BrowserCommander
-[GitHub项目托管] 欢迎拜访与支持！
+[GitHub托管项目] https://github.com/yqs112358/BrowserCommander
+[GitHub托管项目] 欢迎拜访与支持！
 提示： 使用命令 &apos;Help&apos; 来获取使用指导。
 </translation>
     </message>
