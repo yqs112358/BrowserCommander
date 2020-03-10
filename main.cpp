@@ -93,6 +93,10 @@ int main(int argc, char *argv[])
                                  ,QObject::tr(".bcs script file which is runned automatically"));
     parser.process(a);
     QStringList autoScripts(parser.positionalArguments());
+    QString fileName;
+    foreach(fileName,autoScripts)
+        if(!fileName.endsWith(_S(".bcs")))
+            autoScripts.removeOne(fileName);
 
     //Translator
     QTranslator *trans=new QTranslator;

@@ -9,7 +9,7 @@
 extern IoHelp iohelp;
 
 Commander::Commander(QStringList autoScripts,QObject *parent)
-    :QThread(parent)
+    :QThread(parent),autorunScripts(autoScripts)
 {
     //Connect
     sender=new SignalsHelper(this);
