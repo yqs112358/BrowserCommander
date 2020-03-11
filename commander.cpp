@@ -1,4 +1,12 @@
 #include "commander.h"
+#include <QSettings>
+#include <QWebEngineSettings>
+#include <QWebEngineScriptCollection>
+#include <QWebEngineCookieStore>
+#include <QWebEngineHistory>
+#include <QtDebug>
+#include <QDir>
+#include <QDesktopServices>
 
 #define USE_LEFT_ARG(QSTR_NAME) \
     QString QSTR_NAME(cmdIn.readAll().trimmed()); \
@@ -40,6 +48,7 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
     connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::QueuedConnection);
     connect(sender,&SignalsHelper::exit,        this,&Commander::sExit,         Qt::QueuedConnection);
 
+    connect(this,&Commander::finished,sender,&SignalsHelper::sFinished,Qt::QueuedConnection);
 
     //Check Directories
     QDir dir(_S("."));
@@ -405,17 +414,25 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         }
         else if(op == _S("run"))
         {
-            USE_LEFT_ARG(scriptFileName)
-            QFile scriptFile(scriptFileName);
-            if(!scriptFile.exists())
-                writeMsg(tr("Script file no found!"),MsgType::Error);
-            else if(!scriptFile.open(QIODevice::ReadOnly|QIODevice::Text))
-                writeMsg(tr("Fail to open Script file!"),MsgType::Error);
+            USE_LEFT_ARG(runFileName)
+            QFileInfo info(runFileName);
+            if(!info.exists() || info.suffix() != _S("bcs"))
+            {
+                QDesktopServices::openUrl(QUrl::fromUserInput(runFileName));
+            }
             else
             {
-                QTextStream fileIn(&scriptFile);
-                splitCmds(&fileIn,true);
-                scriptFile.close();
+                QFile scriptFile(runFileName);
+                if(!scriptFile.exists())
+                    writeMsg(tr("Script file no found!"),MsgType::Error);
+                else if(!scriptFile.open(QIODevice::ReadOnly|QIODevice::Text))
+                    writeMsg(tr("Fail to open Script file!"),MsgType::Error);
+                else
+                {
+                    QTextStream fileIn(&scriptFile);
+                    splitCmds(&fileIn,true);
+                    scriptFile.close();
+                }
             }
         }
         else if(op == _S("removejs"))
@@ -460,7 +477,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         break;
 
     case 'o':
-        if(op == _S("changeoutput"))
+        if(op == _S("output"))
         {
             USE_LEFT_ARG(newOutput)
             iohelp.changeOutput(newOutput);
@@ -704,8 +721,10 @@ void Commander::sRunJs(QString code)
 {
     curView->page()->runJavaScript(code,jsWorld,[this](QVariant data)
     {
+        if(data.isNull())
+            data=QString("Done.");
         qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()))<< data << "\n";
-        isWaitingFinished=false;
+        emit finished();
     });
 }
 

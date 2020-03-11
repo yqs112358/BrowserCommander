@@ -6,6 +6,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+#Program info
+win32:VERSION = 0.6.1.0 # major.minor.patch.build
+else:VERSION = 0.6.1    # major.minor.patch
+RC_ICONS = BrowserCommander.ico
+QMAKE_TARGET_COMPANY = BrowserCommander
+QMAKE_TARGET_DESCRIPTION = BrowserCommander Application
+QMAKE_TARGET_COPYRIGHT = BSD-2-Clause License
+QMAKE_TARGET_PRODUCT = BrowserCommander
+
 SOURCES +=  \
         Browser/browser.cpp \
         Browser/browserwindow.cpp \
@@ -66,5 +75,3 @@ FORMS += \
     Browser/downloadmanagerwidget.ui \
     Browser/downloadwidget.ui \
     Browser/passworddialog.ui
-
-RC_ICONS = BrowserCommander.ico

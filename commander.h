@@ -8,14 +8,7 @@
 #include <QString>
 #include <QStringList>
 #include <QUrl>
-#include <QSettings>
-#include <QWebEngineSettings>
 #include <QWebEngineScript>
-#include <QWebEngineScriptCollection>
-#include <QWebEngineCookieStore>
-#include <QWebEngineHistory>
-#include <QtDebug>
-#include <QDir>
 #include <windows.h>
 
 #include "Browser/browser.h"
@@ -89,6 +82,8 @@ protected slots:
 
     void tabChanged(int index);
 
+signals:
+    void finished();
 };
 
 #endif // COMMANDER_H
