@@ -15,12 +15,15 @@
 
 ## 命令列表
 ######  作者正在疯狂赶工中。。。
-###### 先看看图片吧：[Command1.JPG](https://i.loli.net/2020/03/12/EdYiUc8K2MSkIoh.jpg "Command1.JPG")  [Command2.JPG](https://i.loli.net/2020/03/12/bDVLhIcs4mzTnkU.jpg "Command2.JPG")
+###### 先看看作者手写的吧：[Command1.JPG](https://i.loli.net/2020/03/12/EdYiUc8K2MSkIoh.jpg "Command1.JPG")  [Command2.JPG](https://i.loli.net/2020/03/12/bDVLhIcs4mzTnkU.jpg "Command2.JPG")
 
 ## 实用脚本实例
+把你的脚本保存成.bcs后缀的文件，然后就可以用“run xxx.bcs”命令来执行，或者放到AutoRun目录下面以让程序每次启动时都自动执行
+（当然，你可以配合计划任务或者crontab做更多有趣的事）
 #### 1.百度贴吧签到
-（需要事先在此浏览器中登录百度账号）
+（需要事先在BrowserCommander浏览器中登录百度账号）
 ```javascript
+############ 贴吧签到 ############
 go tieba.baidu.com
 sleepsec 1
 wait 10000
@@ -29,4 +32,5 @@ js document.getElementsByClassName('onekey_btn')[0].click()
 sleepsec 3
 js document.getElementsByClassName('sign_btn')[0].click()
 sleepsec 3
+end
 ```
