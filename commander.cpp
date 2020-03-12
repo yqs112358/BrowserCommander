@@ -168,7 +168,7 @@ void Commander::writeMsg(QString text, Commander::MsgType type)
             strType=_S("Info");
             break;
     }
-    qDebug() << qPrintable(tr("[%1 %2]%3\n").arg(IoHelp::dateTimeStr()).arg(strType).arg(text));
+    qDebug() << qPrintable(_S("[%1 %2]%3\n").arg(IoHelp::dateTimeStr()).arg(strType).arg(text));
 }
 
 void Commander::unknownCmd(QString op)
@@ -218,7 +218,7 @@ void Commander::splitCmds(QTextStream *stdIn, bool isScript)
     {
         if(!isInScript)
             qDebug() << qPrintable(_S("\n"));
-        qDebug() << qPrintable(tr("%1 %2>").arg(IoHelp::dateTimeStr())
+        qDebug() << qPrintable(_S("%1 %2>").arg(IoHelp::dateTimeStr())
                                .arg(isJsConsoleMode?_S("JsConsole"):_S("Browser")));
 
         cmdLine=stdIn->readLine();
@@ -356,7 +356,12 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
     case 'w':
         if(op == _S("wait"))
         {
-            sender->waitLoading();
+            int maxTime=-1;
+            cmdIn >> maxTime;
+            if(maxTime >= 0)
+                sender->waitLoading(maxTime);
+            else
+                sender->waitLoading();
         }
         else
             unknownCmd(op);
@@ -722,7 +727,7 @@ void Commander::sRunJs(QString code)
     curView->page()->runJavaScript(code,jsWorld,[this](QVariant data)
     {
         if(data.isNull())
-            data=QString("Done.");
+            data=_S("Done.");
         qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()))<< data << "\n";
         emit finished();
     });

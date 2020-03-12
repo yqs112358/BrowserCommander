@@ -18,7 +18,7 @@ private:
     friend class Commander;
     Commander *commander;
     bool isLoading=false;
-    void waitLoading(int checkInterval=50);
+    void waitLoading(int maxTime=-1,int checkInterval=50);
 
 signals:
     void go(QUrl url);

@@ -8,10 +8,10 @@ SignalsHelper::SignalsHelper(Commander *c) : commander(c)
 
 }
 
-void SignalsHelper::waitLoading(int checkInterval)
+void SignalsHelper::waitLoading(int maxTime, int checkInterval)
 {
     QCoreApplication::processEvents();
-    while(isLoading)
+    while(isLoading || (maxTime >=0 && (maxTime-=checkInterval)>0))
     {
         QThread::msleep(checkInterval);
         QCoreApplication::processEvents();
