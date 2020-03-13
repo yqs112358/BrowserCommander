@@ -22,31 +22,31 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
     //Connect
     sender=new SignalsHelper(this);
     sender->moveToThread(this);
-    connect(sender,&SignalsHelper::go,          this,&Commander::sGo,           Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::back,        this,&Commander::sBack,         Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::forward,     this,&Commander::sForward,      Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::reload,      this,&Commander::sReload,       Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::stop,        this,&Commander::sStop,         Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::save,        this,&Commander::sSave,         Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::zoom,        this,&Commander::sZoom,         Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::clearCookie, this,&Commander::sClearCookie,  Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::clearHistory,this,&Commander::sClearHistory, Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::clearCache,  this,&Commander::sClearCache,   Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::history,     this,&Commander::sHistory,      Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::previousTab, this,&Commander::sPreviousTab,  Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::nextTab,     this,&Commander::sNextTab,      Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::newTab,      this,&Commander::sNewTab,       Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::closeTab,    this,&Commander::sCloseTab,     Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::userAgent,   this,&Commander::sUserAgent,    Qt::QueuedConnection);
+    connect(sender,&SignalsHelper::go,          this,&Commander::sGo,           Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::back,        this,&Commander::sBack,         Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::forward,     this,&Commander::sForward,      Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::reload,      this,&Commander::sReload,       Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::stop,        this,&Commander::sStop,         Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::save,        this,&Commander::sSave,         Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::zoom,        this,&Commander::sZoom,         Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::clearCookie, this,&Commander::sClearCookie,  Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::clearHistory,this,&Commander::sClearHistory, Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::clearCache,  this,&Commander::sClearCache,   Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::history,     this,&Commander::sHistory,      Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::previousTab, this,&Commander::sPreviousTab,  Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::nextTab,     this,&Commander::sNextTab,      Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::newTab,      this,&Commander::sNewTab,       Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::closeTab,    this,&Commander::sCloseTab,     Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::userAgent,   this,&Commander::sUserAgent,    Qt::BlockingQueuedConnection);
 
-    connect(sender,&SignalsHelper::runJs,       this,&Commander::sRunJs,        Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::jsSend,      this,&Commander::sJsSend,       Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::addJs,       this,&Commander::sAddJs,        Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::removeJs,    this,&Commander::sRemoveJs,     Qt::QueuedConnection);
+    connect(sender,&SignalsHelper::runJs,       this,&Commander::sRunJs,        Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::jsSend,      this,&Commander::sJsSend,       Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::addJs,       this,&Commander::sAddJs,        Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::removeJs,    this,&Commander::sRemoveJs,     Qt::BlockingQueuedConnection);
 
-    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::QueuedConnection);
-    connect(sender,&SignalsHelper::exit,        this,&Commander::sExit,         Qt::QueuedConnection);
+    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
+    connect(sender,&SignalsHelper::exit,        this,&Commander::sExit,         Qt::BlockingQueuedConnection);
 
     connect(this,&Commander::finished,sender,&SignalsHelper::sFinished,Qt::QueuedConnection);
 
@@ -313,6 +313,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
             USE_LEFT_ARG(url)
             emit sender->stop();
             emit sender->go(QUrl::fromUserInput(url));
+            //sender->isLoading=true;
         }
         else
             unknownCmd(op);
@@ -336,6 +337,7 @@ bool Commander::cmdProcessor(QString cmdStr, QTextStream *stdIn)
         else if(op == _S("stop"))
         {
             emit sender->stop();
+            //sender->isLoading=false;
         }
         else if(op == _S("setjsworld"))
         {
@@ -728,7 +730,12 @@ void Commander::sRunJs(QString code)
     {
         if(data.isNull())
             data=_S("Done.");
-        qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()))<< data << "\n";
+        qDebug() << qPrintable(tr("[%1 JsOutput]").arg(IoHelp::dateTimeStr()));
+        if(data.canConvert(QMetaType::QString))
+            qDebug() << qPrintable(data.toString());
+        else
+            qDebug() << data;
+        qDebug() << "\n";
         emit finished();
     });
 }

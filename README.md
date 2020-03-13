@@ -25,8 +25,7 @@
 ```javascript
 ############ 贴吧签到 ############
 go tieba.baidu.com
-sleepsec 1
-wait 10000
+wait 5000
 sleepsec 3
 js document.getElementsByClassName('onekey_btn')[0].click()
 sleepsec 3
