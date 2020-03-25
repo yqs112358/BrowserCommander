@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     parser.setApplicationDescription(QObject::tr("A simple browser which can be controlled by CLI and script files"));
-    parser.addPositionalArgument(_S(".bcs script file")
+    parser.addPositionalArgument(_S("<.bcs script file>")
                                  ,QObject::tr(".bcs script file which is runned automatically"));
     parser.process(a);
     QStringList autoScripts(parser.positionalArguments());
@@ -117,9 +117,6 @@ int main(int argc, char *argv[])
     }
     conf.endGroup();
 
-    //Style
-    a.setStyle(QStyleFactory::create(_S("fusion")));
-
     //Install output
     iohelp.changeOutput(QString());
     qInstallMessageHandler(outputTransfer);
@@ -129,6 +126,8 @@ int main(int argc, char *argv[])
                             "[Project on GitHub] Welcome to your new ideas!\n"
                             "Tips: Use the command 'Help' to get guidance.\n"
                             ).arg(_S(VER)));
+    //Style
+    a.setStyle(QStyleFactory::create(_S("fusion")));
 
     Commander commander(autoScripts);
 

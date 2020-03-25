@@ -71,6 +71,13 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
         iohelp.cerrDevice.setFileName(debugOutput);
         iohelp.cerrDevice.open(QIODevice::WriteOnly|QIODevice::Text);
     }
+    //CommandEcho
+    QString commandEcho=conf.value(_S("CommandEcho"),_S("Auto")).toString();
+    if(commandEcho == _S("Auto"))
+        cmdEcho=CmdEchoMode::Auto;
+    else if(commandEcho == _S("Always"))
+        cmdEcho=CmdEchoMode::Always;
+    else cmdEcho=CmdEchoMode::No;
     conf.endGroup();
 
     //Browser Settings
@@ -222,7 +229,8 @@ void Commander::splitCmds(QTextStream *stdIn, bool isScript)
                                .arg(isJsConsoleMode?_S("JsConsole"):_S("Browser")));
 
         cmdLine=stdIn->readLine();
-        if(isInScript)
+        if(cmdEcho == CmdEchoMode::Always ||
+                (cmdEcho == CmdEchoMode::Auto && isInScript && !cmdLine.startsWith(_S("print "))))
             qDebug() << qPrintable(cmdLine) << "\n";
 
         bool isEnd=false;
@@ -767,7 +775,6 @@ void Commander::sRemoveJs(QString name)
 
 void Commander::sExit()
 {
-    FreeConsole();
     this->quit();
     BrowserWindow *wnd;
     foreach(wnd,browser->windows())

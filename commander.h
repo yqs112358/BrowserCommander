@@ -9,7 +9,6 @@
 #include <QStringList>
 #include <QUrl>
 #include <QWebEngineScript>
-#include <windows.h>
 
 #include "Browser/browser.h"
 #include "Browser/browserwindow.h"
@@ -33,6 +32,7 @@ public:
     Browser *browser;
 
     enum MsgType{Info,Warning,Error,Fatal};
+    enum CmdEchoMode{Auto,Always,No};
 
 protected:
     void writeMsg(QString text,MsgType type=MsgType::Info);
@@ -52,6 +52,7 @@ private:
 
     quint32 jsWorld=0;
     int startWait=5;
+    CmdEchoMode cmdEcho;
     QStringList autorunScripts;
     QMap<QString,QWebEngineScript*> userScripts;
 
