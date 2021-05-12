@@ -68,21 +68,24 @@ void outputTransfer(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    //High-DPI Support
+    qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
+
     //Settings
     a.setWindowIcon(QIcon(_S(":AppLogoColor.png")));
     QCoreApplication::setOrganizationName(_S(APP_NAME));
     QCoreApplication::setApplicationName(_S(APP_NAME));
     QCoreApplication::setApplicationVersion(_S(VER));
     //Win settings
-    #ifdef Q_OS_WIN
-    //QCoreApplication::addLibraryPath();
+#ifdef Q_OS_WIN
     qputenv("QTWEBENGINEPROCESS_PATH", _S("./BrowserCommanderWeb.exe").toLocal8Bit());
     SetConsoleTitleA(APP_NAME);
-    #endif
+#endif
 
     //Command-line analysis
     QCommandLineParser parser;

@@ -62,4 +62,4 @@ private:
     QString m_lastSearch;
 };
 
-#endif // BROWSERWINDOW_H
+#endif

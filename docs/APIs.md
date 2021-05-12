@@ -1,4 +1,4 @@
-# API文档
+# BrowerCommander - 脚本命令文档
 
 ## 浏览器命令
 
@@ -122,7 +122,7 @@
 
   切换Js工作环境序号
 
-  浏览器引擎为防止Js之间冲突而提供的运行环境隔离，默认所有Js都在环境0中执行
+  浏览器引擎为防止Js之间冲突而提供的运行环境隔离，默认所有网页的Js和用户自行注入的Js都在环境0中执行
 
 ## 控制命令
 
@@ -184,7 +184,7 @@
 
 # 配置文件
 
-`BrowserCommand.ini`
+配置文件位于程序目录的 `BrowserCommand.ini` ，相关配置选项的解释如下
 
 ``` ini
 [Main]
@@ -193,7 +193,7 @@ DefaultOutput=
 ; 调试信息写入的文件路径，留空则不输出调试信息
 DebugOutput=DebugOutputLatest.log
 ; 命令行回显选项，留空则为auto
-; auto 仅在执行脚本时回显 always 总是回显 no 关闭回显
+; auto 仅在执行脚本时回显 / always 总是回显 / no 关闭回显
 CommandEcho=auto
 ; 控制线程开始执行前的休眠时间，单位毫秒，留空则为0
 StartWait=1000
@@ -208,13 +208,13 @@ Language=en_US
 [Browser]
 ; 浏览器默认主页，留空则为空白页
 FirstPage=www.baidu.com
-; 是否默认进入隐私模式，1是0否
+; 是否默认进入隐私模式，1是 / 0否
 DefaultPrivateMode=0
 ; 浏览器UserAgent字符串，留空则为默认值
 UserAgent=
 ```
 
-# 命令行参数
+# 主程序命令行参数
 
 - `[.bcs脚本文件路径]`
 

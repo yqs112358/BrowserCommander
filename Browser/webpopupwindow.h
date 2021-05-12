@@ -27,4 +27,4 @@ private:
     QAction *m_favAction;
     WebView *m_view;
 };
-#endif // WEBPOPUPWINDOW_H
+#endif

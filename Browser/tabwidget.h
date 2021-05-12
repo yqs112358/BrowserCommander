@@ -20,7 +20,6 @@ public:
     WebView *currentWebView() const;
 
 signals:
-    // current tab/page signals
     void linkHovered(const QString &link);
     void loadProgress(int progress);
     void titleChanged(const QString &title);
@@ -30,7 +29,6 @@ signals:
     void devToolsRequested(QWebEnginePage *source);
 
 public slots:
-    // current tab/page slots
     void setUrl(const QUrl &url);
     void triggerWebPageAction(QWebEnginePage::WebAction action);
 
@@ -55,4 +53,4 @@ private:
     QWebEngineProfile *m_profile;
 };
 
-#endif // TABWIDGET_H
+#endif

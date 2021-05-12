@@ -25,4 +25,4 @@ private:
     DownloadManagerWidget m_downloadManagerWidget;
     QScopedPointer<QWebEngineProfile> m_otrProfile;
 };
-#endif // BROWSER_H
+#endif
