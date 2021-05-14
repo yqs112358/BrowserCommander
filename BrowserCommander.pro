@@ -1,4 +1,4 @@
-QT    += core gui webenginewidgets
+QT    += core gui webenginewidgets qml
 
 CONFIG += c++11 console
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -25,9 +25,9 @@ SOURCES +=  \
         Browser/webpopupwindow.cpp \
         Browser/webview.cpp \
         commander.cpp \
+        enginehelper.cpp \
         main.cpp \
-        iohelp.cpp \
-        signalshelper.cpp
+        iohelp.cpp
 
 TRANSLATIONS += \
     BrowserCommander_zh_CN.ts
@@ -48,8 +48,9 @@ HEADERS += \
     Browser/webpopupwindow.h \
     Browser/webview.h \
     commander.h \
-    iohelp.h \
-    signalshelper.h
+    configs.h \
+    enginehelper.h \
+    iohelp.h
 
 DISTFILES += \
     Browser/data/3rdparty/COPYING \

@@ -1,5 +1,6 @@
 #pragma execution_character_set("utf-8")
 
+#include "configs.h"
 #include <QApplication>
 #include <QTranslator>
 #include <QStyleFactory>
@@ -16,8 +17,6 @@
 #endif
 
 #define _S(text) QStringLiteral(text)
-#define APP_NAME "BrowserCommander"
-#define VER "0.6.1"
 
 #include "commander.h"
 #include "iohelp.h"
@@ -68,7 +67,7 @@ void outputTransfer(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
-    //High-DPI Support
+    // High-DPI Support
     qputenv("QT_ENABLE_HIGHDPI_SCALING", "1");
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -76,18 +75,18 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
 
-    //Settings
+    // Application Information
     a.setWindowIcon(QIcon(_S(":AppLogoColor.png")));
     QCoreApplication::setOrganizationName(_S(APP_NAME));
     QCoreApplication::setApplicationName(_S(APP_NAME));
     QCoreApplication::setApplicationVersion(_S(VER));
-    //Win settings
+    // Win settings
 #ifdef Q_OS_WIN
     qputenv("QTWEBENGINEPROCESS_PATH", _S("./BrowserCommanderWeb.exe").toLocal8Bit());
     SetConsoleTitleA(APP_NAME);
 #endif
 
-    //Command-line analysis
+    // Command-line analysis
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
@@ -126,13 +125,46 @@ int main(int argc, char *argv[])
     qDebug() << qPrintable(QObject::tr("<--- BrowserCommander ---> Version %1   Author:yqs112358\n"
                             "[License] BSD-2-Clause\n"
                             "[Project on GitHub] https://github.com/yqs112358/BrowserCommander\n"
-                            "[Project on GitHub] Welcome to your new ideas!\n"
-                            "Tips: Use the command 'Help' to get guidance.\n"
+                            "[Project on GitHub] Welcome to your contribution!\n"
+                            "Tips: Use the command 'help()' to get more guidance.\n"
                             ).arg(_S(VER)));
     //Style
     a.setStyle(QStyleFactory::create(_S("fusion")));
 
-    Commander commander(autoScripts);
+    Browser *browser = new Browser;
+    EngineHelper *engine = new EngineHelper(commander);
+    Commander *commander = new Commander(browser);
+
+    //Connect
+    sender=new EngineHelper(this);
+    sender->moveToThread(this);
+    connect(sender,&EngineHelper::go,          this,&Commander::sGo,           Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::back,        this,&Commander::sBack,         Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::forward,     this,&Commander::sForward,      Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::reload,      this,&Commander::sReload,       Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::stop,        this,&Commander::sStop,         Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::save,        this,&Commander::sSave,         Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::zoom,        this,&Commander::sZoom,         Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::clearCookie, this,&Commander::sClearCookie,  Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::clearHistory,this,&Commander::sClearHistory, Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::clearCache,  this,&Commander::sClearCache,   Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::history,     this,&Commander::sHistory,      Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::previousTab, this,&Commander::sPreviousTab,  Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::nextTab,     this,&Commander::sNextTab,      Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::newTab,      this,&Commander::sNewTab,       Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::closeTab,    this,&Commander::sCloseTab,     Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::userAgent,   this,&Commander::sUserAgent,    Qt::BlockingQueuedConnection);
+
+    connect(sender,&EngineHelper::runJs,       this,&Commander::sRunJs,        Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::jsSend,      this,&Commander::sJsSend,       Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::addJs,       this,&Commander::sAddJs,        Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::removeJs,    this,&Commander::sRemoveJs,     Qt::BlockingQueuedConnection);
+
+    connect(sender,&EngineHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
+    connect(sender,&EngineHelper::exit,        this,&Commander::sExit,         Qt::BlockingQueuedConnection);
+
+    connect(this,&Commander::finished,sender,&EngineHelper::sFinished,Qt::QueuedConnection);
 
     return a.exec();
 }

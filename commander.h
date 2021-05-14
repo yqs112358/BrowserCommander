@@ -15,24 +15,23 @@
 #include "Browser/tabwidget.h"
 #include "Browser/webview.h"
 
-#include "signalshelper.h"
+#include "enginehelper.h"
 #include "iohelp.h"
 
 #define CONF_PATH "./BrowserCommander.ini"
 
-class SignalsHelper;
+class EngineHelper;
 
 class Commander :public QThread
 {
     Q_OBJECT
 public:
-    Commander(QStringList autoScripts,QObject *parent=nullptr);
+    Commander(Browser *b, QObject *parent=nullptr);
     virtual ~Commander();
 
     Browser *browser;
 
     enum MsgType{Info,Warning,Error,Fatal};
-    enum CmdEchoMode{Auto,Always,No};
 
 protected:
     void writeMsg(QString text,MsgType type=MsgType::Info);
@@ -45,18 +44,15 @@ protected:
     bool cmdProcessor(QString cmdStr,QTextStream *stdIn);
 
 private:
-    friend class SignalsHelper;
+    friend class EngineHelper;
     BrowserWindow *curWnd=nullptr;
     TabWidget *tabWidget=nullptr;
     WebView *curView=nullptr;
 
     quint32 jsWorld=0;
     int startWait=5;
-    CmdEchoMode cmdEcho;
-    QStringList autorunScripts;
     QMap<QString,QWebEngineScript*> userScripts;
 
-    SignalsHelper *sender;
     bool isJsConsoleMode=false;
     bool isInScript;
     bool isWaitingFinished=false;

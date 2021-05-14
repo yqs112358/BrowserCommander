@@ -16,40 +16,9 @@
 
 extern IoHelp iohelp;
 
-Commander::Commander(QStringList autoScripts,QObject *parent)
-    :QThread(parent),autorunScripts(autoScripts)
+Commander::Commander(Browser *b, QObject *parent)
+    :QThread(parent),browser(b)
 {
-    //Connect
-    sender=new SignalsHelper(this);
-    sender->moveToThread(this);
-    connect(sender,&SignalsHelper::go,          this,&Commander::sGo,           Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::back,        this,&Commander::sBack,         Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::forward,     this,&Commander::sForward,      Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::reload,      this,&Commander::sReload,       Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::stop,        this,&Commander::sStop,         Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::save,        this,&Commander::sSave,         Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::zoom,        this,&Commander::sZoom,         Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::clearCookie, this,&Commander::sClearCookie,  Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::clearHistory,this,&Commander::sClearHistory, Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::clearCache,  this,&Commander::sClearCache,   Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::history,     this,&Commander::sHistory,      Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::previousTab, this,&Commander::sPreviousTab,  Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::nextTab,     this,&Commander::sNextTab,      Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::newTab,      this,&Commander::sNewTab,       Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::closeTab,    this,&Commander::sCloseTab,     Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::userAgent,   this,&Commander::sUserAgent,    Qt::BlockingQueuedConnection);
-
-    connect(sender,&SignalsHelper::runJs,       this,&Commander::sRunJs,        Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::jsSend,      this,&Commander::sJsSend,       Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::addJs,       this,&Commander::sAddJs,        Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::removeJs,    this,&Commander::sRemoveJs,     Qt::BlockingQueuedConnection);
-
-    connect(sender,&SignalsHelper::restart,     this,&Commander::sRestart,      Qt::BlockingQueuedConnection);
-    connect(sender,&SignalsHelper::exit,        this,&Commander::sExit,         Qt::BlockingQueuedConnection);
-
-    connect(this,&Commander::finished,sender,&SignalsHelper::sFinished,Qt::QueuedConnection);
-
     //Check Directories
     QDir dir(_S("."));
     dir.mkdir(_S("Data"));
@@ -71,13 +40,7 @@ Commander::Commander(QStringList autoScripts,QObject *parent)
         iohelp.cerrDevice.setFileName(debugOutput);
         iohelp.cerrDevice.open(QIODevice::WriteOnly|QIODevice::Text);
     }
-    //CommandEcho
-    QString commandEcho=conf.value(_S("CommandEcho"),_S("Auto")).toString();
-    if(commandEcho == _S("Auto"))
-        cmdEcho=CmdEchoMode::Auto;
-    else if(commandEcho == _S("Always"))
-        cmdEcho=CmdEchoMode::Always;
-    else cmdEcho=CmdEchoMode::No;
+
     conf.endGroup();
 
     //Browser Settings
@@ -793,8 +756,8 @@ void Commander::tabChanged(int index)
         if(curView != nullptr)
             disconnect(curView,0,sender,0);
         curView=curWnd->currentTab();
-        connect(curView,&QWebEngineView::loadStarted,sender,&SignalsHelper::sLoadStart);
-        connect(curView,&QWebEngineView::loadFinished,sender,&SignalsHelper::sLoadEnd);
+        connect(curView,&QWebEngineView::loadStarted,sender,&EngineHelper::sLoadStart);
+        connect(curView,&QWebEngineView::loadFinished,sender,&EngineHelper::sLoadEnd);
         sender->isLoading=false;
     }
 }
